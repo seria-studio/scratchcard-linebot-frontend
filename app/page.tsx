@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function HomePage() {
+function HomePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -94,5 +94,27 @@ export default function HomePage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6 space-y-4">
+            <div className="text-center">
+              <Skeleton className="h-6 w-3/4 mx-auto mb-4" />
+              <Skeleton className="h-4 w-1/2 mx-auto" />
+            </div>
+            <div className="text-center text-sm text-gray-600">
+              載入中...
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    }>
+      <HomePageContent />
+    </Suspense>
   );
 }
