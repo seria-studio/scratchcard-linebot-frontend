@@ -1,4 +1,6 @@
-const API_BASE_URL = 'https://b08b5a763e8a.ngrok-free.app';
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://scratchcard-linebot-backend.seria.moe'
+  : 'https://b08b5a763e8a.ngrok-free.app';
 
 interface ApiRequestOptions extends RequestInit {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
