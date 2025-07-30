@@ -6,7 +6,7 @@ import liff from '@line/liff';
 import { Navigation } from '@/components/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, Shield, Menu } from 'lucide-react';
+import { AlertCircle, Shield } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { apiRequest } from '@/lib/api';
