@@ -210,9 +210,6 @@ export default function ResultsPage() {
                             <div className="font-medium text-xs sm:text-sm truncate" title={result.user_id}>{result.user_id}</div>
                             <div className="text-xs text-gray-500 truncate" title={result.user.display_name || "未知用戶"}>{result.user.display_name || "未知"}</div>
                           </div>
-                          {result.user.is_admin && (
-                            <Badge variant="secondary" className="text-xs shrink-0">管</Badge>
-                          )}
                         </div>
                       </TableCell>
                       <TableCell>
