@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Users, Shield, Activity, Trash2, UserCheck } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useToast } from "@/hooks/use-toast"
+import { Search, Users, Shield, Activity, Trash2, UserCheck, MoreVertical, Copy } from "lucide-react"
 import { apiRequest } from "@/lib/api"
 import { User } from "@/lib/types"
 
@@ -16,6 +18,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true)
   const [userIdSearch, setUserIdSearch] = useState("")
   const [displayNameSearch, setDisplayNameSearch] = useState("")
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchUsers()
@@ -60,20 +63,26 @@ export default function UsersPage() {
       await apiRequest(`/users/${userId}`, {
         method: "DELETE"
       })
-      // Refresh the user list
+      toast({
+        title: "成功",
+        description: "用戶已刪除"
+      })
       fetchUsers(
         userIdSearch.trim() || undefined,
         displayNameSearch.trim() || undefined
       )
     } catch (error) {
       console.error("Failed to delete user:", error)
-      alert("刪除用戶失敗，請稍後再試")
+      toast({
+        title: "錯誤",
+        description: "刪除用戶失敗，請稍後再試",
+        variant: "destructive"
+      })
     }
   }
 
-  const handleToggleAdmin = async (userId: string, currentAdminStatus: boolean) => {
-    const action = currentAdminStatus ? "移除管理員權限" : "設為管理員"
-    if (!confirm(`確定要${action}嗎？`)) {
+  const handleRemoveAdmin = async (userId: string) => {
+    if (!confirm("確定要移除管理員權限嗎？")) {
       return
     }
 
@@ -84,17 +93,41 @@ export default function UsersPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          is_admin: !currentAdminStatus
+          is_admin: false
         })
       })
-      // Refresh the user list
+      toast({
+        title: "成功",
+        description: "已移除管理員權限"
+      })
       fetchUsers(
         userIdSearch.trim() || undefined,
         displayNameSearch.trim() || undefined
       )
     } catch (error) {
-      console.error("Failed to update user admin status:", error)
-      alert("更新用戶權限失敗，請稍後再試")
+      console.error("Failed to remove admin status:", error)
+      toast({
+        title: "錯誤",
+        description: "移除管理員權限失敗，請稍後再試",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleCopyUserId = async (userId: string) => {
+    try {
+      await navigator.clipboard.writeText(userId)
+      toast({
+        title: "成功",
+        description: "用戶ID已複製到剪貼板"
+      })
+    } catch (error) {
+      console.error("Failed to copy user ID:", error)
+      toast({
+        title: "錯誤",
+        description: "複製失敗，請手動複製",
+        variant: "destructive"
+      })
     }
   }
 
@@ -213,26 +246,20 @@ export default function UsersPage() {
               </div>
             ) : (
               <div className="overflow-x-auto mobile-table-scroll px-4 sm:px-0">
-                <Table className="min-w-[800px]">
+                <Table className="min-w-[600px]">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="min-w-[140px] text-xs sm:text-sm">用戶ID</TableHead>
                       <TableHead className="min-w-[120px] text-xs sm:text-sm">顯示名稱</TableHead>
                       <TableHead className="min-w-[80px] text-xs sm:text-sm">角色</TableHead>
                       <TableHead className="min-w-[80px] text-xs sm:text-sm">刮卡次數</TableHead>
                       <TableHead className="min-w-[100px] text-xs sm:text-sm">註冊時間</TableHead>
                       <TableHead className="min-w-[100px] text-xs sm:text-sm">最後活動</TableHead>
-                      <TableHead className="min-w-[180px] text-xs sm:text-sm">操作</TableHead>
+                      <TableHead className="min-w-[80px] text-xs sm:text-sm">操作</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium text-xs sm:text-sm">
-                          <div className="truncate" title={user.id}>
-                            {user.id}
-                          </div>
-                        </TableCell>
                         <TableCell className="text-xs sm:text-sm">
                           <div className="truncate" title={user.display_name || "未設定"}>
                             {user.display_name || "未設定"}
@@ -255,26 +282,35 @@ export default function UsersPage() {
                             : "無活動"}
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-1 sm:gap-2 justify-end">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                              className="flex items-center gap-1 text-xs min-w-[60px] sm:min-w-[100px]"
-                            >
-                              <UserCheck className="h-3 w-3" />
-                              <span className="hidden sm:inline">{user.is_admin ? "移除管理員" : "設為管理員"}</span>
-                              <span className="sm:hidden">{user.is_admin ? "移除" : "設管"}</span>
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteUser(user.id)}
-                              className="h-6 w-6 sm:h-8 sm:w-8 p-0 shrink-0"
-                            >
-                              <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                            </Button>
-                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {user.is_admin && (
+                                <DropdownMenuItem
+                                  onClick={() => handleRemoveAdmin(user.id)}
+                                  className="text-orange-600"
+                                >
+                                  <UserCheck className="mr-2 h-4 w-4" />
+                                  移除管理員
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => handleCopyUserId(user.id)}>
+                                <Copy className="mr-2 h-4 w-4" />
+                                複製用戶ID
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteUser(user.id)}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                刪除
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
