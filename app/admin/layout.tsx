@@ -48,7 +48,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
         if (isLiffLogin && code) {
           // This is a redirect from LINE login
-          await liff.init({ liffId: '2007813637-oRmvzAwx' });
+          await liff.init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID! });
 
           // Clear the URL parameters
           const url = new URL(window.location.href);
@@ -69,7 +69,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
           }
         } else {
           // Normal LIFF initialization
-          await liff.init({ liffId: '2007813637-oRmvzAwx' });
+          await liff.init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID! });
           setLiffInitialized(true);
 
           if (liff.isLoggedIn()) {
