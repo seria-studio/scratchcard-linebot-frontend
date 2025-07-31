@@ -30,6 +30,7 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
   const [prizes, setPrizes] = useState<Prize[]>([])
   const [newPrize, setNewPrize] = useState<Prize>({
     text: "",
+    image: "",
     quantity: 0,
     probability: 0,
   })
@@ -38,7 +39,7 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
   const addPrize = () => {
     if (newPrize.text && newPrize.quantity > 0 && newPrize.probability >= 0 && newPrize.probability <= 1) {
       setPrizes([...prizes, { ...newPrize }])
-      setNewPrize({ text: "", quantity: 0, probability: 0 })
+      setNewPrize({ text: "", image: "", quantity: 0, probability: 0 })
     }
   }
 
@@ -95,7 +96,7 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
               <CardTitle className="text-lg">新增獎品</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="space-y-2">
                   <Label htmlFor="prize-text">獎品名稱</Label>
                   <Input
@@ -105,6 +106,17 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
                     onChange={(e) => setNewPrize({ ...newPrize, text: e.target.value })}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="prize-image">獎品圖片網址</Label>
+                  <Input
+                    id="prize-image"
+                    placeholder="https://example.com/image.jpg (選填)"
+                    value={newPrize.image || ""}
+                    onChange={(e) => setNewPrize({ ...newPrize, image: e.target.value || null })}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="prize-quantity">獎品數量</Label>
                   <Input
