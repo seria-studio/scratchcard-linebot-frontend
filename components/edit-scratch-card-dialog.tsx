@@ -87,7 +87,7 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
         <DialogHeader>
           <DialogTitle>編輯刮刮卡</DialogTitle>
           <DialogDescription>編輯刮刮卡名稱、獎品和中獎機率</DialogDescription>
@@ -106,7 +106,7 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
               <CardTitle className="text-lg">新增獎品</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="space-y-2">
                   <Label htmlFor="prize-text">獎品名稱</Label>
                   <Input
@@ -126,7 +126,7 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="prize-quantity">數量</Label>
                   <Input
@@ -175,7 +175,8 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
                 </div>
               </CardHeader>
               <CardContent>
-                <Table>
+                <div className="overflow-x-auto mobile-table-scroll">
+                  <Table className="min-w-[600px]">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="w-[50px]">序號</TableHead>
@@ -212,8 +213,9 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
                         </TableCell>
                       </TableRow>
                     ))}
-                  </TableBody>
-                </Table>
+                    </TableBody>
+                  </Table>
+                </div>
 
                 {getTotalProbability() !== 1 && (
                   <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -227,11 +229,11 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
             取消
           </Button>
-          <Button onClick={handleSubmit} disabled={!name || prizes.length === 0 || loading}>
+          <Button onClick={handleSubmit} disabled={!name || prizes.length === 0 || loading} className="w-full sm:w-auto">
             {loading ? "儲存中..." : "儲存變更"}
           </Button>
         </DialogFooter>

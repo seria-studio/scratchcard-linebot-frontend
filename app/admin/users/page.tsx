@@ -121,7 +121,7 @@ export default function UsersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">總用戶數</CardTitle>
@@ -154,13 +154,13 @@ export default function UsersPage() {
       </div>
 
         {/* Search */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>搜尋用戶</CardTitle>
-            <CardDescription>根據用戶ID或顯示名稱搜尋用戶</CardDescription>
+        <Card className="mb-4 sm:mb-6">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base sm:text-lg">搜尋用戶</CardTitle>
+            <CardDescription className="text-sm">根據用戶ID或顯示名稱搜尋用戶</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div className="space-y-2">
                 <Label htmlFor="user_id">用戶ID</Label>
                 <Input
@@ -183,11 +183,11 @@ export default function UsersPage() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button onClick={handleSearch} className="flex items-center gap-2 flex-1 sm:flex-none">
+              <Button onClick={handleSearch} className="flex items-center gap-2 w-full sm:w-auto">
                 <Search className="h-4 w-4" />
                 搜尋
               </Button>
-              <Button variant="outline" onClick={handleClearSearch} className="sm:w-auto">
+              <Button variant="outline" onClick={handleClearSearch} className="w-full sm:w-auto">
                 清除
               </Button>
             </div>
@@ -196,15 +196,15 @@ export default function UsersPage() {
 
         {/* Users Table */}
         <Card>
-          <CardHeader>
-            <CardTitle>所有用戶</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base sm:text-lg">所有用戶</CardTitle>
+            <CardDescription className="text-sm">
               顯示 {users.length} 位用戶
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0 px-0 sm:px-6">
             {users.length === 0 && !loading ? (
-              <div className="text-center py-12">
+              <div className="text-center py-12 px-4 sm:px-0">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">找不到用戶</h3>
                 <p className="text-gray-600">
@@ -212,8 +212,8 @@ export default function UsersPage() {
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <Table>
+              <div className="overflow-x-auto mobile-table-scroll px-4 sm:px-0">
+                <Table className="min-w-[800px]">
                   <TableHeader>
                     <TableRow>
                       <TableHead className="min-w-[140px] text-xs sm:text-sm">用戶ID</TableHead>
@@ -255,12 +255,12 @@ export default function UsersPage() {
                             : "無活動"}
                         </TableCell>
                         <TableCell>
-                          <div className="flex gap-1 sm:gap-2">
+                          <div className="flex gap-1 sm:gap-2 justify-end">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                              className="flex items-center gap-1 text-xs"
+                              className="flex items-center gap-1 text-xs min-w-[60px] sm:min-w-[100px]"
                             >
                               <UserCheck className="h-3 w-3" />
                               <span className="hidden sm:inline">{user.is_admin ? "移除管理員" : "設為管理員"}</span>
@@ -270,7 +270,7 @@ export default function UsersPage() {
                               variant="destructive"
                               size="sm"
                               onClick={() => handleDeleteUser(user.id)}
-                              className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                              className="h-6 w-6 sm:h-8 sm:w-8 p-0 shrink-0"
                             >
                               <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
@@ -278,7 +278,7 @@ export default function UsersPage() {
                         </TableCell>
                       </TableRow>
                     ))}
-                  </TableBody>
+                    </TableBody>
                 </Table>
               </div>
             )}

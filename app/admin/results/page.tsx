@@ -105,16 +105,16 @@ export default function ResultsPage() {
       </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Search className="h-5 w-5" />
+      <Card className="mb-4 sm:mb-6">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5" />
             篩選條件
           </CardTitle>
-          <CardDescription>根據用戶ID、刮刮卡ID、刮刮卡名稱或獎品名稱篩選結果</CardDescription>
+          <CardDescription className="text-sm">根據用戶ID、刮刮卡ID、刮刮卡名稱或獎品名稱篩選結果</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <CardContent className="pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div className="space-y-2">
               <Label htmlFor="user_id">用戶ID</Label>
               <Input
@@ -153,11 +153,11 @@ export default function ResultsPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Button onClick={handleSearch} className="flex items-center gap-2 flex-1 sm:flex-none">
+            <Button onClick={handleSearch} className="flex items-center gap-2 w-full sm:w-auto">
               <Search className="h-4 w-4" />
               搜尋
             </Button>
-            <Button variant="outline" onClick={handleClearFilters} className="sm:w-auto">
+            <Button variant="outline" onClick={handleClearFilters} className="w-full sm:w-auto">
               清除篩選
             </Button>
           </div>
@@ -166,22 +166,22 @@ export default function ResultsPage() {
 
       {/* Results */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
             刮卡記錄 ({results.length} 筆)
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-0 px-0 sm:px-6">
           {results.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-12 px-4 sm:px-0">
               <Trophy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">沒有找到記錄</h3>
               <p className="text-gray-600">請調整篩選條件或確認資料是否存在</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="overflow-x-auto mobile-table-scroll px-4 sm:px-0">
+              <Table className="min-w-[700px]">
                 <TableHeader>
                   <TableRow>
                     <TableHead className="min-w-[140px] text-xs sm:text-sm">時間</TableHead>

@@ -259,8 +259,8 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
             </div>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <main className="p-2">
+        <div className="flex flex-1 flex-col gap-4 p-2 sm:p-4 pt-0">
+          <main className="p-1 sm:p-2">
             {children}
           </main>
         </div>

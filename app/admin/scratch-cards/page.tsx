@@ -79,12 +79,12 @@ export default function ScratchCardsPage() {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">刮刮卡管理</h1>
-          <p className="text-gray-600 mt-2">管理您的刮刮卡和獎品設定</p>
+      <div className="flex flex-col sm:flex-row gap-4 sm:justify-between sm:items-center mb-6 sm:mb-8">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">刮刮卡管理</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">管理您的刮刮卡和獎品設定</p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} className="flex items-center gap-2">
+        <Button onClick={() => setShowCreateDialog(true)} className="flex items-center gap-2 w-full sm:w-auto">
           <Plus className="h-4 w-4" />
           新增刮刮卡
         </Button>
@@ -94,29 +94,37 @@ export default function ScratchCardsPage() {
         {scratchCards.map((card) => (
           <Card key={card.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <Gift className="h-6 w-6" />
-                    {card.name}
+              <div className="flex flex-col gap-4">
+                <div className="flex-1">
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl break-words">
+                    <Gift className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
+                    <span className="break-all">{card.name}</span>
                   </CardTitle>
-                  <CardDescription className="mt-2">
-                    建立時間：{new Date(card.created_at).toLocaleDateString("zh-TW")} | 獎品數量：{card.prizes.length}{" "}
-                    | 總中獎率：
-                    <Badge
-                      variant={getTotalProbability(card.prizes) === 1 ? "default" : "destructive"}
-                      className="ml-1"
-                    >
-                      {(getTotalProbability(card.prizes) * 100).toFixed(1)}%
-                    </Badge>
+                  <CardDescription className="mt-2 text-sm break-words">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                      <span>建立時間：{new Date(card.created_at).toLocaleDateString("zh-TW")}</span>
+                      <span className="hidden sm:inline">|</span>
+                      <span>獎品數量：{card.prizes.length}</span>
+                      <span className="hidden sm:inline">|</span>
+                      <span className="flex items-center gap-1">
+                        總中獎率：
+                        <Badge
+                          variant={getTotalProbability(card.prizes) === 1 ? "default" : "destructive"}
+                          className="text-xs"
+                        >
+                          {(getTotalProbability(card.prizes) * 100).toFixed(1)}%
+                        </Badge>
+                      </span>
+                    </div>
                   </CardDescription>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleCopyUrl(card.id)}>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" onClick={() => handleCopyUrl(card.id)} className="w-full sm:w-auto">
                     <Copy className="h-4 w-4 mr-1" />
-                    複製連結
+                    <span className="hidden sm:inline">複製連結</span>
+                    <span className="sm:hidden">複製</span>
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleEditClick(card)}>
+                  <Button variant="outline" size="sm" onClick={() => handleEditClick(card)} className="w-full sm:w-auto">
                     <Edit className="h-4 w-4 mr-1" />
                     編輯
                   </Button>
@@ -124,7 +132,7 @@ export default function ScratchCardsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => deleteScratchCard(card.id)}
-                    className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                    className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 w-full sm:w-auto"
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
                     刪除
@@ -133,42 +141,49 @@ export default function ScratchCardsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium mb-4 text-lg">獎品列表</h4>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">序號</TableHead>
-                      <TableHead>獎品名稱</TableHead>
-                      <TableHead className="text-right">獎品數量</TableHead>
-                      <TableHead className="text-right">中獎機率</TableHead>
-                      <TableHead className="text-right">預期中獎數</TableHead>
-                    </TableRow>
-                  </TableHeader>
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-4">
+                <h4 className="font-medium mb-4 text-base sm:text-lg">獎品列表</h4>
+                <div className="overflow-x-auto mobile-table-scroll">
+                  <Table className="min-w-[600px]">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px] text-xs sm:text-sm">序號</TableHead>
+                        <TableHead className="min-w-[120px] text-xs sm:text-sm">獎品名稱</TableHead>
+                        <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">獎品數量</TableHead>
+                        <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">中獎機率</TableHead>
+                        <TableHead className="text-right min-w-[100px] text-xs sm:text-sm">預期中獎數</TableHead>
+                      </TableRow>
+                    </TableHeader>
                   <TableBody>
                     {card.prizes.map((prize, index) => (
                       <TableRow key={prize.id}>
-                        <TableCell className="font-medium">{index + 1}</TableCell>
-                        <TableCell className="font-medium">{prize.text}</TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary">{prize.quantity}</Badge>
+                        <TableCell className="font-medium text-xs sm:text-sm">{index + 1}</TableCell>
+                        <TableCell className="font-medium text-xs sm:text-sm">
+                          <div className="truncate max-w-[120px] sm:max-w-none" title={prize.text}>
+                            {prize.text}
+                          </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
+                          <Badge variant="secondary" className="text-xs">{prize.quantity}</Badge>
                         </TableCell>
-                        <TableCell className="text-right text-sm text-muted-foreground">
-                          每1000次約{Math.round(prize.probability * 1000)}次
+                        <TableCell className="text-right">
+                          <Badge variant="outline" className="text-xs">{(prize.probability * 100).toFixed(2)}%</Badge>
+                        </TableCell>
+                        <TableCell className="text-right text-xs text-muted-foreground">
+                          <span className="hidden sm:inline">每1000次約{Math.round(prize.probability * 1000)}次</span>
+                          <span className="sm:hidden">{Math.round(prize.probability * 1000)}/1k</span>
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
-                </Table>
+                  </Table>
+                </div>
 
-                <div className="mt-4 pt-4 border-t flex justify-between items-center">
-                  <div className="text-sm text-muted-foreground">總獎品數：{card.prizes.length} 個</div>
-                  <div className="text-sm">
+                <div className="mt-4 pt-4 border-t flex flex-col sm:flex-row sm:justify-between gap-2 sm:items-center">
+                  <div className="text-xs sm:text-sm text-muted-foreground">總獎品數：{card.prizes.length} 個</div>
+                  <div className="text-xs sm:text-sm">
                     <span className="text-muted-foreground">總中獎率：</span>
-                    <Badge variant={getTotalProbability(card.prizes) === 1 ? "default" : "destructive"}>
+                    <Badge variant={getTotalProbability(card.prizes) === 1 ? "default" : "destructive"} className="text-xs">
                       {(getTotalProbability(card.prizes) * 100).toFixed(2)}%
                     </Badge>
                     {getTotalProbability(card.prizes) !== 1 && (
@@ -183,11 +198,11 @@ export default function ScratchCardsPage() {
       </div>
 
       {scratchCards.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-8 sm:py-12 px-4">
           <Gift className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">尚未建立任何刮刮卡</h3>
-          <p className="text-gray-600 mb-4">建立您的第一張刮刮卡開始使用</p>
-          <Button onClick={() => setShowCreateDialog(true)}>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">尚未建立任何刮刮卡</h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-4">建立您的第一張刮刮卡開始使用</p>
+          <Button onClick={() => setShowCreateDialog(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             建立第一張刮刮卡
           </Button>
