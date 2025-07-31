@@ -1,44 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Search, Calendar, Trophy, User, Gift, Trash2 } from "lucide-react"
+import { Search, Calendar, Trophy, User as UserIcon, Gift, Trash2 } from "lucide-react"
 import { apiRequest } from "@/lib/api"
-
-interface User {
-  id: string
-  display_name: string
-  admin: boolean
-}
-
-interface ScratchCard {
-  id: string
-  name: string
-}
-
-interface Prize {
-  id: string
-  text: string
-  image?: string
-  quantity: number
-  probability: number
-}
-
-interface ScratchResult {
-  id: string
-  user_id: string
-  scratch_card_id: string
-  prize_id?: string
-  created_at: string
-  user: User
-  scratch_card: ScratchCard
-  prize?: Prize
-}
+import { ScratchResult } from "@/lib/types"
 
 export default function ResultsPage() {
   const [results, setResults] = useState<ScratchResult[]>([])
@@ -50,11 +21,7 @@ export default function ResultsPage() {
     prize_name: "",
   })
 
-  useEffect(() => {
-    fetchResults()
-  }, [])
-
-  const fetchResults = async () => {
+  const fetchResults = useCallback(async () => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -79,7 +46,11 @@ export default function ResultsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filters])
+
+  useEffect(() => {
+    fetchResults()
+  }, [fetchResults])
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -234,12 +205,12 @@ export default function ResultsPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1 sm:gap-2">
-                          <User className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 shrink-0" />
+                          <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 text-gray-500 shrink-0" />
                           <div className="min-w-0 flex-1">
                             <div className="font-medium text-xs sm:text-sm truncate" title={result.user_id}>{result.user_id}</div>
                             <div className="text-xs text-gray-500 truncate" title={result.user.display_name || "未知用戶"}>{result.user.display_name || "未知"}</div>
                           </div>
-                          {result.user.admin && (
+                          {result.user.is_admin && (
                             <Badge variant="secondary" className="text-xs shrink-0">管</Badge>
                           )}
                         </div>

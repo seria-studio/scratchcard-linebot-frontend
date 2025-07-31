@@ -17,23 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Trash2 } from "lucide-react"
 import { apiRequest } from "@/lib/api"
-
-interface Prize {
-  id?: string // Prize ID is optional for new prizes, but present for existing ones
-  text: string
-  image?: string
-  quantity: number
-  probability: number
-}
-
-interface ScratchCard {
-  id: string
-  name: string
-  created_at: string
-  updated_at: string
-  prizes: Prize[]
-  results: any[]
-}
+import { Prize, ScratchCard } from "@/lib/types"
 
 interface EditScratchCardDialogProps {
   open: boolean

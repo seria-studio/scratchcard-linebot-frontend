@@ -9,23 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Search, Users, Shield, Activity, Trash2, UserCheck } from "lucide-react"
 import { apiRequest } from "@/lib/api"
-
-interface ScratchResult {
-  id: string
-  user_id: string
-  scratch_card_id: string
-  prize_id: string
-  created_at: string
-}
-
-interface User {
-  id: string
-  is_admin: boolean
-  created_at: string
-  updated_at: string
-  scratch_results: ScratchResult[]
-  display_name: string | null
-}
+import { User } from "@/lib/types"
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])

@@ -17,13 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Trash2 } from "lucide-react"
 import { apiRequest } from "@/lib/api"
-
-interface Prize {
-  text: string
-  image?: string
-  quantity: number
-  probability: number
-}
+import { Prize } from "@/lib/types"
 
 interface CreateScratchCardDialogProps {
   open: boolean

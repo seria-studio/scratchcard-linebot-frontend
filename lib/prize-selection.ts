@@ -1,4 +1,4 @@
-import type { Prize, ScratchResult, ScratchCard } from './types';
+import type { Prize, ScratchCard } from './types';
 
 interface PrizeSelectionError {
   type: 'no_prizes' | 'out_of_stock' | 'api_error';

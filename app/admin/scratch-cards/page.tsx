@@ -10,23 +10,7 @@ import { CreateScratchCardDialog } from "@/components/create-scratch-card-dialog
 import { EditScratchCardDialog } from "@/components/edit-scratch-card-dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { apiRequest } from "@/lib/api"
-
-interface Prize {
-  id: string
-  text: string
-  image?: string
-  quantity: number
-  probability: number
-}
-
-interface ScratchCard {
-  id: string
-  name: string
-  created_at: string
-  updated_at: string
-  prizes: Prize[]
-  results: any[]
-}
+import { Prize, ScratchCard } from "@/lib/types"
 
 export default function ScratchCardsPage() {
   const [scratchCards, setScratchCards] = useState<ScratchCard[]>([])
