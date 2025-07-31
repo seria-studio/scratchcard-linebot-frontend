@@ -8,7 +8,8 @@
             "env": {
                 "NODE_ENV": "production",
                 "PORT": "3005",
-                "NEXT_PUBLIC_LIFF_ID": "2007813637-oRmvzAwx"
+                "NEXT_PUBLIC_LIFF_ID": "2007813637-oRmvzAwx",
+                "NEXT_PUBLIC_API_URL": "https://scratchcard-linebot-backend.seria.moe"
             }
         }
     ]

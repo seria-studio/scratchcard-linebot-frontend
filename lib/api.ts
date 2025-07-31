@@ -1,6 +1,4 @@
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://scratchcard-linebot-backend.seria.moe'
-  : 'https://b08b5a763e8a.ngrok-free.app';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bc67fde3e514.ngrok-free.app';
 
 interface ApiRequestOptions extends RequestInit {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -11,7 +9,7 @@ export async function apiRequest<T = any>(
   options: ApiRequestOptions = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-  
+
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
@@ -27,7 +25,7 @@ export async function apiRequest<T = any>(
   };
 
   const response = await fetch(url, config);
-  
+
   if (!response.ok) {
     throw new Error(`API request failed: ${response.status} ${response.statusText}`);
   }

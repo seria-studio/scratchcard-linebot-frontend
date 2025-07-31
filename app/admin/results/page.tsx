@@ -102,18 +102,11 @@ export default function ResultsPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://b08b5a763e8a.ngrok-free.app'}/results/${resultId}`, {
-        method: 'DELETE',
-        headers: {
-          'ngrok-skip-browser-warning': 'true',
-        }
+      await apiRequest(`/results/${resultId}`, {
+        method: 'DELETE'
       })
 
-      if (response.ok) {
-        setResults(prevResults => prevResults.filter(result => result.id !== resultId))
-      } else {
-        throw new Error(`Delete failed: ${response.status}`)
-      }
+      setResults(prevResults => prevResults.filter(result => result.id !== resultId))
     } catch (error) {
       console.error("Failed to delete result:", error)
       alert('刪除失敗，請稍後再試。')
