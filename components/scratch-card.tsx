@@ -74,7 +74,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
     return Math.round((transparentPixels / totalPixels) * 100);
   }, []);
 
-  const scratch = useCallback((x: number, y: number) => {
+  const scratch = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas || isRevealed) return;
 
@@ -82,12 +82,14 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    
+    // Calculate coordinates relative to the canvas element (not the scaled canvas)
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc((x - rect.left) * scaleX, (y - rect.top) * scaleY, 20 * window.devicePixelRatio, 0, Math.PI * 2);
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
     ctx.fill();
 
     if (!hasStartedScratching) {
