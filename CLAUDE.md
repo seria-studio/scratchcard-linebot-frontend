@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Status: Initial Setup Complete
+
+**Current State**: Fresh Next.js 15 project with TypeScript, Tailwind CSS, and complete shadcn/ui component library integration. All files are untracked (initial commit only).
+
 ## Overview
 
 This is a Next.js-based scratchcard LINE Bot frontend application using TypeScript, Tailwind CSS, and shadcn/ui components. The app provides an admin interface for managing scratch cards and tracking user results.
@@ -25,41 +29,76 @@ npm run lint
 ## Project Architecture
 
 ### Tech Stack
-- **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS with CSS-in-JS via CSS variables
-- **UI Components**: shadcn/ui with Radix UI primitives
-- **Forms**: React Hook Form with Zod validation
-- **LINE Integration**: @line/liff for LINE Bot integration
+- **Framework**: Next.js 15.2.4 with App Router
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 3.4.17 with CSS variables
+- **UI Components**: Complete shadcn/ui component library with Radix UI primitives
+- **Forms**: React Hook Form 7.54.1 with Zod 3.24.1 validation
+- **LINE Integration**: @line/liff 2.27.1 for LINE Bot integration
+- **Icons**: Lucide React 0.454.0
+- **Themes**: next-themes 0.4.4 for dark mode support
+- **Charts**: Recharts 2.15.0 for data visualization
+- **Notifications**: Sonner 1.7.1 for toast notifications
 
 ### Directory Structure
 
 ```
-├── app/                    # Next.js App Router pages
-│   ├── admin/             # Admin interface routes
-│   │   ├── scratch-cards/ # Scratch card management
-│   │   ├── users/         # User management
-│   │   └── results/       # Results tracking
-│   ├── layout.tsx         # Root layout with Chinese locale
-│   └── page.tsx           # Home page
+├── app/                           # Next.js App Router pages
+│   ├── admin/                    # Admin interface routes
+│   │   ├── layout.tsx           # Admin layout
+│   │   ├── page.tsx             # Admin dashboard
+│   │   ├── scratch-cards/       # Scratch card management
+│   │   │   └── page.tsx
+│   │   ├── users/               # User management
+│   │   │   ├── loading.tsx      # Loading UI
+│   │   │   └── page.tsx
+│   │   └── results/             # Results tracking
+│   │       └── page.tsx
+│   ├── scratch-cards/           # Public scratch card routes
+│   │   └── [id]/
+│   │       └── page.tsx         # Individual scratch card
+│   ├── globals.css              # Global Tailwind styles
+│   ├── layout.tsx               # Root layout
+│   └── page.tsx                 # Home page
 ├── components/
-│   ├── ui/                # shadcn/ui components
-│   ├── scratch-card.tsx   # Interactive scratch card component
-│   ├── navigation.tsx     # Admin sidebar navigation
-│   └── *.tsx             # Feature-specific components
+│   ├── ui/                      # Complete shadcn/ui component library (40+ components)
+│   ├── scratch-card.tsx         # Interactive scratch card component
+│   ├── navigation.tsx           # Admin sidebar navigation
+│   ├── theme-provider.tsx       # Theme context provider
+│   ├── create-scratch-card-dialog.tsx
+│   └── edit-scratch-card-dialog.tsx
+├── hooks/                       # Custom React hooks
+│   ├── use-mobile.tsx          # Mobile detection hook
+│   └── use-toast.ts            # Toast notification hook
 ├── lib/
-│   ├── types.ts          # TypeScript interfaces
-│   ├── api.ts            # API utilities
-│   ├── utils.ts          # Utility functions (cn helper)
-│   └── prize-selection.ts # Prize logic
-└── styles/               # Global styles
+│   ├── types.ts                # TypeScript interfaces
+│   ├── api.ts                  # API utilities
+│   ├── utils.ts                # Utility functions (cn helper)
+│   └── prize-selection.ts      # Prize logic
+├── public/                     # Static assets
+│   ├── placeholder-logo.png
+│   ├── placeholder-logo.svg
+│   ├── placeholder-user.jpg
+│   ├── placeholder.jpg
+│   └── placeholder.svg
+└── styles/
+    └── globals.css             # Additional global styles
 ```
 
 ### Key Components
 
 - **ScratchCard**: Interactive canvas-based scratch card with touch/mouse support
-- **Navigation**: Admin sidebar with Chinese text and Lucide icons
-- **UI Components**: Complete shadcn/ui component library for forms, dialogs, tables
+- **Navigation**: Admin sidebar with Chinese text and Lucide icons  
+- **Theme Provider**: Dark/light mode support with next-themes
+- **Dialog Components**: Create and edit scratch card dialogs
+- **UI Library**: Complete shadcn/ui component library (40+ components) including:
+  - Forms, dialogs, tables, charts, navigation
+  - Accordion, alert, avatar, badge, breadcrumb
+  - Button, calendar, card, carousel, checkbox
+  - Command palette, context menu, dropdown
+  - Input, label, popover, progress, select
+  - Sheet, skeleton, slider, switch, tabs
+  - Toast notifications with Sonner integration
 
 ### State Management & Data Flow
 
@@ -70,10 +109,12 @@ npm run lint
 
 ### Styling Approach
 
-- CSS-in-JS using Tailwind with CSS custom properties
-- Dark mode support configured but may need theme provider
+- Tailwind CSS 3.4.17 with CSS custom properties for theming
+- Dark mode support via next-themes with theme provider configured
 - Responsive design with mobile-first approach
 - Chinese language support with appropriate fonts
+- CSS-in-JS approach using CSS variables for dynamic theming
+- Tailwind animations and custom utilities via tailwindcss-animate
 
 ### LINE Bot Integration
 
@@ -105,9 +146,29 @@ npm run lint
 - Build optimization with Next.js
 - TypeScript strict mode enabled
 
+## Current Development Status
+
+### Completed Setup
+✅ Next.js 15.2.4 with App Router and TypeScript 5  
+✅ Complete shadcn/ui component library integration (40+ components)  
+✅ Tailwind CSS 3.4.17 with custom theming system  
+✅ Dark mode support with next-themes  
+✅ LINE Bot integration setup (@line/liff 2.27.1)  
+✅ Form handling with React Hook Form + Zod validation  
+✅ Project structure with admin interface routes  
+✅ Custom hooks for mobile detection and toast notifications  
+✅ PM2 production configuration (port 3005)  
+
+### Ready for Development
+🔄 All files currently untracked (awaiting initial implementation)  
+🔄 API integration layer prepared in lib/api.ts  
+🔄 Type definitions ready in lib/types.ts  
+🔄 Prize selection logic structure in place  
+
 ## Testing
 
 No test framework is currently configured. When adding tests, consider:
 - Jest + React Testing Library for component tests
-- Cypress or Playwright for E2E testing
+- Cypress or Playwright for E2E testing  
 - Test scratch card interactions and form submissions
+- API integration testing
