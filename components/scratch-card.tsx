@@ -20,7 +20,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
   const [scratchPercentage, setScratchPercentage] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
 
-  const REVEAL_THRESHOLD = 50;
+  const REVEAL_THRESHOLD = 30;
 
   const initializeCanvas = useCallback(() => {
     const canvas = canvasRef.current;

@@ -129,6 +129,9 @@ function ScratchCardPageContent() {
 
     setHasScratched(true);
 
+    // Disable scratch result submission temporarily for debugging
+    return;
+
     try {
       await apiRequest('/results/', {
         method: 'POST',
@@ -247,7 +250,7 @@ function ScratchCardPageContent() {
         <div className="mt-8 text-center">
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
             <p className="text-white/90 text-sm">
-              💡 提示：用手指或滑鼠刮開銀色塗層，刮開 50% 即可看到完整獎品！
+              💡 提示：用手指或滑鼠刮開銀色塗層，刮開 30% 即可看到完整獎品！
             </p>
           </div>
         </div>
