@@ -184,19 +184,6 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
         />
       </div>
 
-      {hasStartedScratching && !isRevealed && (
-        <div className="mt-4 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 inline-block">
-            <p className="text-sm text-gray-600">已刮開 {scratchPercentage}%</p>
-            <div className="w-32 bg-gray-200 rounded-full h-2 mt-2">
-              <div
-                className="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min(scratchPercentage, 100)}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
