@@ -13,7 +13,7 @@ import { apiRequest } from '@/lib/api';
 import { selectPrizeForUser } from '@/lib/prize-selection';
 import type { ScratchCard as ScratchCardType, Prize, APIResponse } from '@/lib/types';
 
-interface ScratchCardPageProps {}
+interface ScratchCardPageProps { }
 
 function ScratchCardPageContent() {
   const params = useParams();
@@ -129,8 +129,6 @@ function ScratchCardPageContent() {
 
     setHasScratched(true);
 
-    // Disable scratch result submission temporarily for debugging
-    return;
 
     try {
       await apiRequest('/results/', {
