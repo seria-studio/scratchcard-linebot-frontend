@@ -1,3 +1,22 @@
+// LIFF Type declarations
+declare global {
+  interface Window {
+    liff: {
+      init: (config: { liffId: string }) => Promise<void>;
+      ready: Promise<void>;
+      isLoggedIn: () => boolean;
+      login: () => void;
+      logout: () => void;
+      getAccessToken: () => string;
+      getProfile: () => Promise<{
+        userId: string;
+        displayName: string;
+        pictureUrl: string;
+      }>;
+    };
+  }
+}
+
 export interface APIResponse<T> {
   data: T;
   message: string;

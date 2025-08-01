@@ -4,6 +4,23 @@ interface ApiRequestOptions extends RequestInit {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
 }
 
+// Get access token from LIFF
+async function getAccessToken(): Promise<string | null> {
+  try {
+    // Check if LIFF is available and initialized
+    if (typeof window !== 'undefined' && window.liff) {
+      const liff = window.liff;
+      if (liff.isLoggedIn()) {
+        return liff.getAccessToken();
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Failed to get access token:', error);
+    return null;
+  }
+}
+
 export async function apiRequest<T = any>(
   endpoint: string,
   options: ApiRequestOptions = {}
@@ -14,6 +31,11 @@ export async function apiRequest<T = any>(
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
   };
+
+  const accessToken = await getAccessToken();
+  if (accessToken) {
+    defaultHeaders['Authorization'] = `Bearer ${accessToken}`;
+  }
 
   const config: RequestInit = {
     method: 'GET',

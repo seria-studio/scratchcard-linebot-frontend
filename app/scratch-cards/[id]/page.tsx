@@ -134,7 +134,6 @@ function ScratchCardPageContent() {
       await apiRequest('/results/', {
         method: 'POST',
         body: JSON.stringify({
-          user_id: lineUserId,
           scratch_card_id: scratchCardId,
           prize_id: selectedPrize.id
         })
