@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Edit, Trash2, Gift, Copy } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Plus, Edit, Trash2, Gift, Copy, MoreVertical } from "lucide-react"
 import { CreateScratchCardDialog } from "@/components/create-scratch-card-dialog"
 import { EditScratchCardDialog } from "@/components/edit-scratch-card-dialog"
 import { useToast } from "@/components/ui/use-toast"
@@ -92,52 +98,57 @@ export default function ScratchCardsPage() {
 
       <div className="space-y-6">
         {scratchCards.map((card) => (
-          <Card key={card.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex flex-col gap-4">
-                <div className="flex-1">
-                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl break-words">
-                    <Gift className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
-                    <span className="break-all">{card.name}</span>
-                  </CardTitle>
-                  <CardDescription className="mt-2 text-sm break-words">
-                    <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-                      <span>建立時間：{new Date(card.created_at).toLocaleDateString("zh-TW")}</span>
-                      <span className="hidden sm:inline">|</span>
-                      <span>獎品數量：{card.prizes.length}</span>
-                      <span className="hidden sm:inline">|</span>
-                      <span className="flex items-center gap-1">
-                        總中獎率：
-                        <Badge
-                          variant={getTotalProbability(card.prizes) === 1 ? "default" : "destructive"}
-                          className="text-xs"
-                        >
-                          {(getTotalProbability(card.prizes) * 100).toFixed(1)}%
-                        </Badge>
-                      </span>
-                    </div>
-                  </CardDescription>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                  <Button variant="outline" size="sm" onClick={() => handleCopyUrl(card.id)} className="w-full sm:w-auto">
-                    <Copy className="h-4 w-4 mr-1" />
-                    <span className="hidden sm:inline">複製連結</span>
-                    <span className="sm:hidden">複製</span>
+          <Card key={card.id} className="hover:shadow-lg transition-shadow relative">
+            <div className="absolute top-4 right-4 z-10">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                    <span className="sr-only">開啟選單</span>
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleEditClick(card)} className="w-full sm:w-auto">
-                    <Edit className="h-4 w-4 mr-1" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleCopyUrl(card.id)}>
+                    <Copy className="h-4 w-4 mr-2" />
+                    複製連結
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleEditClick(card)}>
+                    <Edit className="h-4 w-4 mr-2" />
                     編輯
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
                     onClick={() => deleteScratchCard(card.id)}
-                    className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 w-full sm:w-auto"
+                    className="text-red-600 focus:text-red-600"
                   >
-                    <Trash2 className="h-4 w-4 mr-1" />
+                    <Trash2 className="h-4 w-4 mr-2" />
                     刪除
-                  </Button>
-                </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <CardHeader>
+              <div className="pr-8">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl break-words">
+                  <Gift className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" />
+                  <span className="break-all">{card.name}</span>
+                </CardTitle>
+                <CardDescription className="mt-2 text-sm break-words">
+                  <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                    <span>建立時間：{new Date(card.created_at).toLocaleDateString("zh-TW")}</span>
+                    <span className="hidden sm:inline">|</span>
+                    <span>獎品數量：{card.prizes.length}</span>
+                    <span className="hidden sm:inline">|</span>
+                    <span className="flex items-center gap-1">
+                      總中獎率：
+                      <Badge
+                        variant={getTotalProbability(card.prizes) === 1 ? "default" : "destructive"}
+                        className="text-xs"
+                      >
+                        {(getTotalProbability(card.prizes) * 100).toFixed(1)}%
+                      </Badge>
+                    </span>
+                  </div>
+                </CardDescription>
               </div>
             </CardHeader>
             <CardContent>
