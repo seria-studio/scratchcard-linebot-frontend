@@ -245,7 +245,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
   return (
     <SidebarProvider>
       <Navigation onLogout={handleLogout} />
-      <SidebarInset>
+      <SidebarInset className="w-full max-w-full overflow-x-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 px-4 bg-white border-b border-gray-200">
           <SidebarTrigger className="-ml-1" />
           <div className="flex-1 flex justify-between items-center">
