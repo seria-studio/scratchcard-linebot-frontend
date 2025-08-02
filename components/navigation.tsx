@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Gift, Users, Trophy, LogOut } from "lucide-react"
+import { Gift, Users, Trophy, MessageSquare, LogOut } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +19,7 @@ const navigation = [
   { name: "刮刮卡管理", href: "/admin/scratch-cards", icon: Gift },
   { name: "用戶管理", href: "/admin/users", icon: Users },
   { name: "刮卡結果", href: "/admin/results", icon: Trophy },
+  { name: "廣播訊息", href: "/admin/broadcast", icon: MessageSquare },
 ]
 
 interface NavigationProps {
