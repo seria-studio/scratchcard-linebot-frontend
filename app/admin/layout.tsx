@@ -105,31 +105,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
         let userData;
         try {
-          // Try to get existing user data from API
-          const response = await apiRequest(`/users/${lineUserId}`);
+          const response = await apiRequest(`/me`);
           userData = response.data;
         } catch (error: any) {
-          // Check if it's a 404 error by parsing the error message
-          if (error.message && error.message.includes('404')) {
-            // User doesn't exist, create new user
-            try {
-              const profile = await liff.getProfile();
-              const createResponse = await apiRequest(`/users`, {
-                method: 'POST',
-                body: JSON.stringify({
-                  id: lineUserId,
-                  display_name: profile.displayName
-                })
-              });
-              userData = createResponse.data;
-            } catch (createError) {
-              console.error('Failed to create user:', createError);
-              setError('無法建立用戶資料，請稍後再試');
-              return;
-            }
-          } else {
-            throw error;
-          }
+          console.error('Failed to fetch user data:', error);
         }
 
         if (!userData) {
