@@ -10,25 +10,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Next.js-based scratchcard LINE Bot frontend application using TypeScript, Tailwind CSS, and shadcn/ui components. The app provides an admin interface for managing scratch cards and tracking user results.
 
-## Development Commands
-
-```bash
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Production server
-npm start
-
-# Linting
-npm run lint
-```
-
 ## Project Architecture
 
 ### Tech Stack
+
 - **Framework**: Next.js 15.2.4 with App Router
 - **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 3.4.17 with CSS variables
@@ -125,50 +110,27 @@ npm run lint
 ## Development Guidelines
 
 ### Component Patterns
+
 - All interactive components use 'use client' directive
 - Event handlers use useCallback for performance
 - Canvas interactions support both mouse and touch events
 - Form components integrate with react-hook-form
 
 ### Styling Conventions
+
 - Use shadcn/ui components for consistent design
 - Leverage Tailwind utility classes
 - CSS custom properties defined in globals.css
 - Icons from Lucide React library
 
 ### API Integration
+
 - Centralized API utilities in lib/api.ts
 - TypeScript interfaces in lib/types.ts
 - Error handling with toast notifications
 
 ### Production Deployment
+
 - PM2 configuration for production (port 3005)
 - Build optimization with Next.js
 - TypeScript strict mode enabled
-
-## Current Development Status
-
-### Completed Setup
-✅ Next.js 15.2.4 with App Router and TypeScript 5  
-✅ Complete shadcn/ui component library integration (40+ components)  
-✅ Tailwind CSS 3.4.17 with custom theming system  
-✅ Dark mode support with next-themes  
-✅ LINE Bot integration setup (@line/liff 2.27.1)  
-✅ Form handling with React Hook Form + Zod validation  
-✅ Project structure with admin interface routes  
-✅ Custom hooks for mobile detection and toast notifications  
-✅ PM2 production configuration (port 3005)  
-
-### Ready for Development
-🔄 All files currently untracked (awaiting initial implementation)  
-🔄 API integration layer prepared in lib/api.ts  
-🔄 Type definitions ready in lib/types.ts  
-🔄 Prize selection logic structure in place  
-
-## Testing
-
-No test framework is currently configured. When adding tests, consider:
-- Jest + React Testing Library for component tests
-- Cypress or Playwright for E2E testing  
-- Test scratch card interactions and form submissions
-- API integration testing
