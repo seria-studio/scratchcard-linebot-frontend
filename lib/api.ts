@@ -47,12 +47,13 @@ export async function apiRequest<T = any>(
   };
 
   const response = await fetch(url, config);
+  const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    throw new Error(`API request failed: [${response.status}] ${data.message}`);
   }
 
-  return response.json();
+  return data;
 }
 
 export function getApiUrl(endpoint: string): string {
