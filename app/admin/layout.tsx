@@ -105,7 +105,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
         let userData;
         try {
-          const response = await apiRequest(`/me`);
+          const profile = await liff.getProfile();
+          const displayName = profile.displayName;
+
+          const response = await apiRequest(`/me?name=${encodeURIComponent(displayName)}`);
           userData = response.data;
         } catch (error: any) {
           console.error('Failed to fetch user data:', error);
