@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Prize } from '@/lib/types';
+import Image from 'next/image';
 
 interface ScratchCardProps {
   prize: Prize;
@@ -17,7 +18,6 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScratching, setIsScratching] = useState(false);
   const [hasStartedScratching, setHasStartedScratching] = useState(false);
-  const [scratchPercentage, setScratchPercentage] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
 
   const REVEAL_THRESHOLD = 30;
@@ -31,10 +31,10 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
 
     const rect = canvas.getBoundingClientRect();
     const devicePixelRatio = window.devicePixelRatio || 1;
-    
+
     canvas.width = rect.width * devicePixelRatio;
     canvas.height = rect.height * devicePixelRatio;
-    
+
     ctx.scale(devicePixelRatio, devicePixelRatio);
     canvas.style.width = rect.width + 'px';
     canvas.style.height = rect.height + 'px';
@@ -63,7 +63,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
     let transparentPixels = 0;
-    let totalPixels = pixels.length / 4;
+    const totalPixels = pixels.length / 4;
 
     for (let i = 3; i < pixels.length; i += 4) {
       if (pixels[i] < 128) {
@@ -82,7 +82,7 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    
+
     // Calculate coordinates relative to the canvas element (not the scaled canvas)
     const x = clientX - rect.left;
     const y = clientY - rect.top;
@@ -98,7 +98,6 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
     }
 
     const percentage = calculateScratchPercentage();
-    setScratchPercentage(percentage);
 
     if (percentage >= REVEAL_THRESHOLD && !isRevealed) {
       setIsRevealed(true);
@@ -160,10 +159,12 @@ export const ScratchCard: React.FC<ScratchCardProps> = ({
         <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
           <div className="text-center">
             {prize.image && (
-              <img
+              <Image
                 src={prize.image}
                 alt={prize.text}
                 className="w-24 h-24 object-cover rounded-lg mx-auto mb-4"
+                width={96}
+                height={96}
               />
             )}
             <h3 className="text-2xl font-bold text-gray-800 mb-2">恭喜獲得</h3>

@@ -5,15 +5,12 @@ import { useParams, useSearchParams } from 'next/navigation';
 import liff from '@line/liff';
 import { ScratchCard } from '@/components/scratch-card';
 import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AlertCircle, Gift, Frown } from 'lucide-react';
+import { Gift, Frown } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
 import { selectPrizeForUser } from '@/lib/prize-selection';
 import type { ScratchCard as ScratchCardType, Prize, APIResponse } from '@/lib/types';
-
-interface ScratchCardPageProps { }
 
 function ScratchCardPageContent() {
   const params = useParams();
@@ -187,10 +184,6 @@ function ScratchCardPageContent() {
       <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6">
-            <Alert className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
 
             <div className="text-center space-y-4">
               <Frown className="h-12 w-12 text-gray-400 mx-auto" />
