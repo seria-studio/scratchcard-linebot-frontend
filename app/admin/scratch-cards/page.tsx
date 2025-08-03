@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Plus, Edit, Trash2, Gift, Copy, MoreVertical } from "lucide-react"
+import { Plus, Edit, Trash2, Gift, Copy, MoreVertical, Infinity } from "lucide-react"
 import { CreateScratchCardDialog } from "@/components/create-scratch-card-dialog"
 import { EditScratchCardDialog } from "@/components/edit-scratch-card-dialog"
 import { useToast } from "@/components/ui/use-toast"
@@ -175,7 +175,16 @@ export default function ScratchCardsPage() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Badge variant="secondary" className="text-xs">{prize.quantity}</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {prize.quantity === null ? (
+                              <span className="flex items-center gap-1">
+                                <Infinity className="h-3 w-3" />
+                                無限
+                              </span>
+                            ) : (
+                              prize.quantity
+                            )}
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <Badge variant="outline" className="text-xs">{(prize.probability * 100).toFixed(2)}%</Badge>

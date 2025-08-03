@@ -14,8 +14,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Infinity } from "lucide-react"
 import { apiRequest } from "@/lib/api"
 import { Prize, ScratchCard } from "@/lib/types"
 
@@ -35,6 +36,7 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
     quantity: 0,
     probability: 0,
   })
+  const [isUnlimitedQuantity, setIsUnlimitedQuantity] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -49,9 +51,11 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
   }, [cardToEdit])
 
   const addPrize = () => {
-    if (newPrize.text && newPrize.quantity > 0 && newPrize.probability >= 0 && newPrize.probability <= 1) {
-      setPrizes([...prizes, { ...newPrize }])
+    const prizeQuantity = isUnlimitedQuantity ? null : newPrize.quantity
+    if (newPrize.text && (isUnlimitedQuantity || newPrize.quantity > 0) && newPrize.probability >= 0 && newPrize.probability <= 1) {
+      setPrizes([...prizes, { ...newPrize, quantity: prizeQuantity }])
       setNewPrize({ text: "", image: "", quantity: 0, probability: 0 })
+      setIsUnlimitedQuantity(false)
     }
   }
 
@@ -129,13 +133,32 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="prize-quantity">數量</Label>
-                  <Input
-                    id="prize-quantity"
-                    type="number"
-                    placeholder="0"
-                    value={newPrize.quantity || ""}
-                    onChange={(e) => setNewPrize({ ...newPrize, quantity: Number(e.target.value) })}
-                  />
+                  <div className="space-y-2">
+                    <Input
+                      id="prize-quantity"
+                      type="number"
+                      placeholder="0"
+                      value={isUnlimitedQuantity ? "" : (newPrize.quantity || "")}
+                      onChange={(e) => setNewPrize({ ...newPrize, quantity: Number(e.target.value) })}
+                      disabled={isUnlimitedQuantity}
+                    />
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="unlimited-quantity"
+                        checked={isUnlimitedQuantity}
+                        onCheckedChange={(checked) => {
+                          setIsUnlimitedQuantity(checked as boolean)
+                          if (checked) {
+                            setNewPrize({ ...newPrize, quantity: 0 })
+                          }
+                        }}
+                      />
+                      <Label htmlFor="unlimited-quantity" className="text-sm flex items-center gap-1">
+                        <Infinity className="h-3 w-3" />
+                        無限數量
+                      </Label>
+                    </div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="prize-probability">中獎機率 (0-1)</Label>
@@ -177,42 +200,51 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
               <CardContent>
                 <div className="overflow-x-auto mobile-table-scroll">
                   <Table className="min-w-[600px]">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">序號</TableHead>
-                      <TableHead>獎品名稱</TableHead>
-                      <TableHead className="text-right">數量</TableHead>
-                      <TableHead className="text-right">機率</TableHead>
-                      <TableHead className="text-right">預期中獎</TableHead>
-                      <TableHead className="w-[80px]">操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {prizes.map((prize, index) => (
-                      <TableRow key={prize.id || index}>
-                        <TableCell className="font-medium">{index + 1}</TableCell>
-                        <TableCell className="font-medium">{prize.text}</TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary">{prize.quantity}</Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
-                        </TableCell>
-                        <TableCell className="text-right text-sm text-muted-foreground">
-                          每1000次約{Math.round(prize.probability * 1000)}次
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removePrize(index)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]">序號</TableHead>
+                        <TableHead>獎品名稱</TableHead>
+                        <TableHead className="text-right">數量</TableHead>
+                        <TableHead className="text-right">機率</TableHead>
+                        <TableHead className="text-right">預期中獎</TableHead>
+                        <TableHead className="w-[80px]">操作</TableHead>
                       </TableRow>
-                    ))}
+                    </TableHeader>
+                    <TableBody>
+                      {prizes.map((prize, index) => (
+                        <TableRow key={prize.id || index}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="font-medium">{prize.text}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="secondary">
+                              {prize.quantity === null ? (
+                                <span className="flex items-center gap-1">
+                                  <Infinity className="h-3 w-3" />
+                                  無限
+                                </span>
+                              ) : (
+                                prize.quantity
+                              )}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
+                          </TableCell>
+                          <TableCell className="text-right text-sm text-muted-foreground">
+                            每1000次約{Math.round(prize.probability * 1000)}次
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removePrize(index)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>

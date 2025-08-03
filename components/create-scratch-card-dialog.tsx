@@ -14,8 +14,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Infinity } from "lucide-react"
 import { apiRequest } from "@/lib/api"
 import { Prize } from "@/lib/types"
 
@@ -34,12 +35,15 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
     quantity: 0,
     probability: 0,
   })
+  const [isUnlimitedQuantity, setIsUnlimitedQuantity] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const addPrize = () => {
-    if (newPrize.text && newPrize.quantity > 0 && newPrize.probability >= 0 && newPrize.probability <= 1) {
-      setPrizes([...prizes, { ...newPrize }])
+    const prizeQuantity = isUnlimitedQuantity ? null : newPrize.quantity
+    if (newPrize.text && (isUnlimitedQuantity || newPrize.quantity > 0) && newPrize.probability >= 0 && newPrize.probability <= 1) {
+      setPrizes([...prizes, { ...newPrize, quantity: prizeQuantity }])
       setNewPrize({ text: "", image: "", quantity: 0, probability: 0 })
+      setIsUnlimitedQuantity(false)
     }
   }
 
@@ -119,13 +123,32 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="prize-quantity">獎品數量</Label>
-                  <Input
-                    id="prize-quantity"
-                    type="number"
-                    placeholder="0"
-                    value={newPrize.quantity || ""}
-                    onChange={(e) => setNewPrize({ ...newPrize, quantity: Number(e.target.value) })}
-                  />
+                  <div className="space-y-2">
+                    <Input
+                      id="prize-quantity"
+                      type="number"
+                      placeholder="0"
+                      value={isUnlimitedQuantity ? "" : (newPrize.quantity || "")}
+                      onChange={(e) => setNewPrize({ ...newPrize, quantity: Number(e.target.value) })}
+                      disabled={isUnlimitedQuantity}
+                    />
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="unlimited-quantity" 
+                        checked={isUnlimitedQuantity}
+                        onCheckedChange={(checked) => {
+                          setIsUnlimitedQuantity(checked as boolean)
+                          if (checked) {
+                            setNewPrize({ ...newPrize, quantity: 0 })
+                          }
+                        }}
+                      />
+                      <Label htmlFor="unlimited-quantity" className="text-sm flex items-center gap-1">
+                        <Infinity className="h-3 w-3" />
+                        無限數量
+                      </Label>
+                    </div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="prize-probability">中獎機率 (0-1)</Label>
@@ -183,7 +206,16 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
                         <TableCell className="font-medium">{index + 1}</TableCell>
                         <TableCell className="font-medium">{prize.text}</TableCell>
                         <TableCell className="text-right">
-                          <Badge variant="secondary">{prize.quantity}</Badge>
+                          <Badge variant="secondary">
+                            {prize.quantity === null ? (
+                              <span className="flex items-center gap-1">
+                                <Infinity className="h-3 w-3" />
+                                無限
+                              </span>
+                            ) : (
+                              prize.quantity
+                            )}
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>

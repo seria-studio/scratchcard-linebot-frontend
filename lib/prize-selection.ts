@@ -35,6 +35,11 @@ export function selectPrizeForUser(
 
     // Step 2-3: Calculate remaining stock for each prize using the results field
     const availablePrizes = scratchCard.prizes.filter(prize => {
+      // If quantity is null, prize has unlimited stock
+      if (prize.quantity === null) {
+        return true;
+      }
+      
       const usedCount = prize.results?.length || 0;
       const remainingStock = prize.quantity - usedCount;
       return remainingStock > 0;
@@ -104,6 +109,16 @@ export function getPrizeStock(scratchCard: ScratchCard) {
   try {
     return scratchCard.prizes.map(prize => {
       const used = prize.results?.length || 0;
+      
+      // If quantity is null, prize has unlimited stock
+      if (prize.quantity === null) {
+        return {
+          prize: prize,
+          remaining: Infinity,
+          used: used
+        };
+      }
+      
       const remaining = Math.max(0, prize.quantity - used);
       
       return {

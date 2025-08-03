@@ -38,7 +38,7 @@ export interface Prize extends BaseModel {
   id: string;
   text: string;
   image: string | null;
-  quantity: number;
+  quantity: number | null;
   probability: number;
   scratch_card_id?: string;
   results: ScratchResult[];
