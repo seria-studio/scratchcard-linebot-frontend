@@ -49,8 +49,13 @@ export default function UsersPage() {
       setTotalPages(paginatedData.total_pages)
       setCurrentPage(paginatedData.page)
       setPageSize(paginatedData.page_size)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch users:", error)
+      toast({
+        variant: "destructive",
+        title: "載入失敗",
+        description: error?.message || "載入用戶資料失敗，請稍後再試"
+      })
     } finally {
       setLoading(false)
     }

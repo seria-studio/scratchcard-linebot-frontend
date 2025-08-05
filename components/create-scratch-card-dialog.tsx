@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Trash2, Infinity } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 import { apiRequest } from "@/lib/api"
 import { Prize } from "@/lib/types"
 
@@ -37,6 +38,7 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
   })
   const [isUnlimitedQuantity, setIsUnlimitedQuantity] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
 
   const addPrize = () => {
     const prizeQuantity = isUnlimitedQuantity ? null : newPrize.quantity
@@ -72,8 +74,17 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
       onOpenChange(false)
       setName("")
       setPrizes([])
-    } catch (error) {
+      toast({
+        title: "建立成功",
+        description: "刮刮卡已成功建立"
+      })
+    } catch (error: any) {
       console.error("Failed to create scratch card:", error)
+      toast({
+        variant: "destructive",
+        title: "建立失敗",
+        description: error?.message || "建立刮刮卡失敗，請稍後再試"
+      })
     } finally {
       setLoading(false)
     }
@@ -133,8 +144,8 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
                       disabled={isUnlimitedQuantity}
                     />
                     <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="unlimited-quantity" 
+                      <Checkbox
+                        id="unlimited-quantity"
                         checked={isUnlimitedQuantity}
                         onCheckedChange={(checked) => {
                           setIsUnlimitedQuantity(checked as boolean)
@@ -190,51 +201,51 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
               <CardContent>
                 <div className="overflow-x-auto mobile-table-scroll">
                   <Table className="min-w-[600px]">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]">序號</TableHead>
-                      <TableHead>獎品名稱</TableHead>
-                      <TableHead className="text-right">數量</TableHead>
-                      <TableHead className="text-right">機率</TableHead>
-                      <TableHead className="text-right">預期中獎</TableHead>
-                      <TableHead className="w-[80px]">操作</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {prizes.map((prize, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">{index + 1}</TableCell>
-                        <TableCell className="font-medium">{prize.text}</TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary">
-                            {prize.quantity === null ? (
-                              <span className="flex items-center gap-1">
-                                <Infinity className="h-3 w-3" />
-                                無限
-                              </span>
-                            ) : (
-                              prize.quantity
-                            )}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
-                        </TableCell>
-                        <TableCell className="text-right text-sm text-muted-foreground">
-                          每1000次約{Math.round(prize.probability * 1000)}次
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removePrize(index)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]">序號</TableHead>
+                        <TableHead>獎品名稱</TableHead>
+                        <TableHead className="text-right">數量</TableHead>
+                        <TableHead className="text-right">機率</TableHead>
+                        <TableHead className="text-right">預期中獎</TableHead>
+                        <TableHead className="w-[80px]">操作</TableHead>
                       </TableRow>
-                    ))}
+                    </TableHeader>
+                    <TableBody>
+                      {prizes.map((prize, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{index + 1}</TableCell>
+                          <TableCell className="font-medium">{prize.text}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="secondary">
+                              {prize.quantity === null ? (
+                                <span className="flex items-center gap-1">
+                                  <Infinity className="h-3 w-3" />
+                                  無限
+                                </span>
+                              ) : (
+                                prize.quantity
+                              )}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
+                          </TableCell>
+                          <TableCell className="text-right text-sm text-muted-foreground">
+                            每1000次約{Math.round(prize.probability * 1000)}次
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removePrize(index)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>

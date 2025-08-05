@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Trash2, Infinity } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 import { apiRequest } from "@/lib/api"
 import { Prize, ScratchCard } from "@/lib/types"
 
@@ -38,6 +39,7 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
   })
   const [isUnlimitedQuantity, setIsUnlimitedQuantity] = useState(false)
   const [loading, setLoading] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     if (cardToEdit) {
@@ -82,8 +84,17 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
 
       onSuccess()
       onOpenChange(false)
-    } catch (error) {
+      toast({
+        title: "更新成功",
+        description: "刮刮卡已成功更新"
+      })
+    } catch (error: any) {
       console.error("Failed to update scratch card:", error)
+      toast({
+        variant: "destructive",
+        title: "更新失敗",
+        description: error?.message || "更新刮刮卡失敗，請稍後再試"
+      })
     } finally {
       setLoading(false)
     }

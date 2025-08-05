@@ -115,6 +115,11 @@ function ScratchCardPageContent() {
         } else {
           setError('載入刮刮卡失敗，請稍後再試');
         }
+        toast({
+          variant: "destructive",
+          title: "載入失敗",
+          description: error?.message || "載入刮刮卡失敗，請稍後再試"
+        });
       } finally {
         setLoading(false);
       }

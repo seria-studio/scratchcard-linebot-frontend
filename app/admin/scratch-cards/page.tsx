@@ -55,8 +55,13 @@ export default function ScratchCardsPage() {
       }, {} as Record<string, PrizeStock[]>)
 
       setPrizeStocks(stockMap)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch scratch cards:", error)
+      toast({
+        variant: "destructive",
+        title: "載入失敗",
+        description: error?.message || "載入刮刮卡失敗，請稍後再試"
+      })
     } finally {
       setLoading(false)
     }
@@ -70,8 +75,17 @@ export default function ScratchCardsPage() {
         method: "DELETE",
       })
       setScratchCards((cards) => cards.filter((card) => card.id !== cardId))
-    } catch (error) {
+      toast({
+        title: "刪除成功",
+        description: "刮刮卡已成功刪除"
+      })
+    } catch (error: any) {
       console.error("Failed to delete scratch card:", error)
+      toast({
+        variant: "destructive",
+        title: "刪除失敗",
+        description: error?.message || "刪除刮刮卡失敗，請稍後再試"
+      })
     }
   }
 
