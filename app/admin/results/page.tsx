@@ -6,13 +6,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Calendar, Trophy, User as UserIcon, Gift, Trash2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationEllipsis } from "@/components/ui/pagination"
+import { Search, Calendar, Trophy, User as UserIcon, Gift, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { apiRequest } from "@/lib/api"
-import { ScratchResult } from "@/lib/types"
+import { ScratchResult, PaginatedResponse } from "@/lib/types"
 
 export default function ResultsPage() {
   const [results, setResults] = useState<ScratchResult[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+  const [totalResults, setTotalResults] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const [filters, setFilters] = useState({
     user_id: "",
     scratch_card_id: "",
@@ -20,7 +27,7 @@ export default function ResultsPage() {
     prize_name: "",
   })
 
-  const fetchResults = useCallback(async () => {
+  const fetchResults = useCallback(async (page: number = currentPage, size: number = pageSize) => {
     try {
       setLoading(true)
       const params = new URLSearchParams()
@@ -36,33 +43,42 @@ export default function ResultsPage() {
       if (filters.prize_name.trim()) {
         params.append('prize_name', filters.prize_name.trim())
       }
+      params.append('page', page.toString())
+      params.append('page_size', size.toString())
 
-      const data = await apiRequest(`/results?${params.toString()}`)
+      const response = await apiRequest(`/results?${params.toString()}`)
+      const paginatedData = response.data as PaginatedResponse<ScratchResult>
 
-      setResults(data.data || [])
+      setResults(paginatedData.items || [])
+      setTotalResults(paginatedData.total)
+      setTotalPages(paginatedData.total_pages)
+      setCurrentPage(paginatedData.page)
+      setPageSize(paginatedData.page_size)
     } catch (error) {
       console.error("Failed to fetch results:", error)
     } finally {
       setLoading(false)
     }
-  }, [filters])
+  }, [filters, currentPage, pageSize])
 
   useEffect(() => {
-    fetchResults()
-  }, [fetchResults])
+    fetchResults(1, 20)
+  }, [])
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
   const handleSearch = () => {
-    fetchResults()
+    setCurrentPage(1)
+    fetchResults(1, pageSize)
   }
 
   const handleClearFilters = () => {
     setFilters({ user_id: "", scratch_card_id: "", scratch_card_name: "", prize_name: "" })
+    setCurrentPage(1)
     setTimeout(() => {
-      fetchResults()
+      fetchResults(1, pageSize)
     }, 0)
   }
 
@@ -76,11 +92,95 @@ export default function ResultsPage() {
         method: 'DELETE'
       })
 
-      setResults(prevResults => prevResults.filter(result => result.id !== resultId))
+      fetchResults(currentPage, pageSize)
     } catch (error) {
       console.error("Failed to delete result:", error)
       alert('刪除失敗，請稍後再試。')
     }
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    fetchResults(page, pageSize)
+  }
+
+  const handlePageSizeChange = (newPageSize: string) => {
+    const size = parseInt(newPageSize)
+    setPageSize(size)
+    setCurrentPage(1)
+    fetchResults(1, size)
+  }
+
+  const renderPaginationItems = () => {
+    const items = []
+    const maxVisiblePages = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1)
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1)
+    }
+
+    if (startPage > 1) {
+      items.push(
+        <PaginationItem key="1">
+          <PaginationLink
+            href="#"
+            onClick={(e) => { e.preventDefault(); handlePageChange(1) }}
+            isActive={currentPage === 1}
+            className="cursor-pointer"
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      )
+      if (startPage > 2) {
+        items.push(
+          <PaginationItem key="ellipsis1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        )
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      items.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            href="#"
+            onClick={(e) => { e.preventDefault(); handlePageChange(i) }}
+            isActive={currentPage === i}
+            className="cursor-pointer"
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <PaginationItem key="ellipsis2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        )
+      }
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink
+            href="#"
+            onClick={(e) => { e.preventDefault(); handlePageChange(totalPages) }}
+            isActive={currentPage === totalPages}
+            className="cursor-pointer"
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    }
+
+    return items
   }
 
   if (loading) {
@@ -168,8 +268,11 @@ export default function ResultsPage() {
         <CardHeader className="pb-4">
           <CardTitle className="text-base sm:text-lg flex items-center gap-2">
             <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-            刮卡記錄 ({results.length} 筆)
+            刮卡記錄
           </CardTitle>
+          <CardDescription className="text-sm">
+            顯示第 {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, totalResults)} 項，共 {totalResults} 筆記錄
+          </CardDescription>
         </CardHeader>
         <CardContent className="pt-0 px-0 sm:px-6">
           {results.length === 0 ? (
@@ -246,6 +349,71 @@ export default function ResultsPage() {
             </div>
           )}
         </CardContent>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="px-4 sm:px-6 py-4 border-t">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>每頁顯示</span>
+                <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+                  <SelectTrigger className="w-[70px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>項目</span>
+              </div>
+
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage > 1) handlePageChange(currentPage - 1)
+                      }}
+                      className={cn(
+                        "gap-1 pl-2.5",
+                        currentPage <= 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
+                      )}
+                      size="default"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>上一頁</span>
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {renderPaginationItems()}
+
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (currentPage < totalPages) handlePageChange(currentPage + 1)
+                      }}
+                      className={cn(
+                        "gap-1 pr-2.5",
+                        currentPage >= totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
+                      )}
+                      size="default"
+                    >
+                      <span>下一頁</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </div>
+        )}
       </Card>
     </>
   )

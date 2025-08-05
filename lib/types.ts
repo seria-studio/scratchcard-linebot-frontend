@@ -22,6 +22,19 @@ export interface APIResponse<T> {
   message: string;
 }
 
+export interface PaginationParams {
+  page?: number;
+  page_size?: number;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
 export interface BaseModel {
   created_at: string;
   updated_at: string;
