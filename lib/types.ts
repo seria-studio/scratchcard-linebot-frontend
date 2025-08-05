@@ -81,3 +81,9 @@ export interface PrizeStock {
   used_quantity: number;
   remaining_quantity: number | null;
 }
+
+export interface UserStats {
+  total_users: number;
+  total_admins: number;
+  total_active_users: number;
+}

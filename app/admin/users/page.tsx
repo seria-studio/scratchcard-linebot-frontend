@@ -14,10 +14,11 @@ import { useToast } from "@/components/ui/use-toast"
 import { Search, Users, Shield, Activity, Trash2, UserCheck, MoreVertical, Copy, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { apiRequest } from "@/lib/api"
-import { User, PaginatedResponse } from "@/lib/types"
+import { User, PaginatedResponse, UserStats } from "@/lib/types"
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([])
+  const [stats, setStats] = useState<UserStats>({ total_users: 0, total_admins: 0, total_active_users: 0 })
   const [loading, setLoading] = useState(true)
   const [userIdSearch, setUserIdSearch] = useState("")
   const [displayNameSearch, setDisplayNameSearch] = useState("")
@@ -28,8 +29,23 @@ export default function UsersPage() {
   const { toast } = useToast()
 
   useEffect(() => {
+    fetchUserStats()
     fetchUsers(undefined, undefined, 1, 20)
   }, [])
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await apiRequest("/users/stats")
+      setStats(response.data as UserStats)
+    } catch (error: any) {
+      console.error("Failed to fetch user stats:", error)
+      toast({
+        variant: "destructive",
+        title: "載入統計失敗",
+        description: error?.message || "載入用戶統計失敗，請稍後再試"
+      })
+    }
+  }
 
   const fetchUsers = async (userId?: string, displayName?: string, page: number = currentPage, size: number = pageSize) => {
     try {
@@ -159,8 +175,8 @@ export default function UsersPage() {
     }
   }
 
-  const adminUsers = users.filter((user) => user.is_admin).length
-  const activeUsers = users.filter((user) => user.scratch_results.length > 0).length
+  // Use stats from API instead of filtering current page users
+  const { total_users: totalUsersFromStats, total_admins: adminUsers, total_active_users: activeUsers } = stats
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -282,7 +298,7 @@ export default function UsersPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalUsers}</div>
+            <div className="text-2xl font-bold">{totalUsersFromStats}</div>
           </CardContent>
         </Card>
 
