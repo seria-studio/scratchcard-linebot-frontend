@@ -73,3 +73,11 @@ export interface ScratchResult extends BaseModel {
   scratch_card: ScratchCard;
   prize: Prize;
 }
+
+export interface PrizeStock {
+  prize_id: string;
+  prize_text: string;
+  initial_quantity: number | null;
+  used_quantity: number;
+  remaining_quantity: number | null;
+}

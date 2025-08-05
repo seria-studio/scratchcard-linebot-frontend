@@ -16,10 +16,11 @@ import { CreateScratchCardDialog } from "@/components/create-scratch-card-dialog
 import { EditScratchCardDialog } from "@/components/edit-scratch-card-dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { apiRequest } from "@/lib/api"
-import { Prize, ScratchCard } from "@/lib/types"
+import { Prize, ScratchCard, PrizeStock } from "@/lib/types"
 
 export default function ScratchCardsPage() {
   const [scratchCards, setScratchCards] = useState<ScratchCard[]>([])
+  const [prizeStocks, setPrizeStocks] = useState<Record<string, PrizeStock[]>>({})
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -33,7 +34,27 @@ export default function ScratchCardsPage() {
   const fetchScratchCards = async () => {
     try {
       const data = await apiRequest("/scratch_cards")
-      setScratchCards(data.data || [])
+      const cards = data.data || []
+      setScratchCards(cards)
+
+      // Fetch stock data for each card
+      const stockPromises = cards.map(async (card: ScratchCard) => {
+        try {
+          const stockData = await apiRequest(`/scratch_cards/${card.id}/stock`)
+          return { cardId: card.id, stocks: stockData.data || [] }
+        } catch (error) {
+          console.error(`Failed to fetch stock for card ${card.id}:`, error)
+          return { cardId: card.id, stocks: [] }
+        }
+      })
+
+      const stockResults = await Promise.all(stockPromises)
+      const stockMap = stockResults.reduce((acc, { cardId, stocks }) => {
+        acc[cardId] = stocks
+        return acc
+      }, {} as Record<string, PrizeStock[]>)
+
+      setPrizeStocks(stockMap)
     } catch (error) {
       console.error("Failed to fetch scratch cards:", error)
     } finally {
@@ -70,6 +91,11 @@ export default function ScratchCardsPage() {
       title: "連結已複製",
       description: "刮刮卡連結已成功複製到剪貼簿。",
     })
+  }
+
+  const getStockForPrize = (cardId: string, prizeId: string): PrizeStock | null => {
+    const cardStocks = prizeStocks[cardId] || []
+    return cardStocks.find(stock => stock.prize_id === prizeId) || null
   }
 
   if (loading) {
@@ -116,7 +142,7 @@ export default function ScratchCardsPage() {
                     <Edit className="h-4 w-4 mr-2" />
                     編輯
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => deleteScratchCard(card.id)}
                     className="text-red-600 focus:text-red-600"
                   >
@@ -161,41 +187,64 @@ export default function ScratchCardsPage() {
                         <TableHead className="w-[50px] text-xs sm:text-sm">序號</TableHead>
                         <TableHead className="min-w-[120px] text-xs sm:text-sm">獎品名稱</TableHead>
                         <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">獎品數量</TableHead>
+                        <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">剩餘庫存</TableHead>
                         <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">中獎機率</TableHead>
                         <TableHead className="text-right min-w-[100px] text-xs sm:text-sm">預期中獎數</TableHead>
                       </TableRow>
                     </TableHeader>
-                  <TableBody>
-                    {card.prizes.map((prize, index) => (
-                      <TableRow key={prize.id}>
-                        <TableCell className="font-medium text-xs sm:text-sm">{index + 1}</TableCell>
-                        <TableCell className="font-medium text-xs sm:text-sm">
-                          <div className="truncate max-w-[120px] sm:max-w-none" title={prize.text}>
-                            {prize.text}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="secondary" className="text-xs">
-                            {prize.quantity === null ? (
-                              <span className="flex items-center gap-1">
-                                <Infinity className="h-3 w-3" />
-                                無限
-                              </span>
-                            ) : (
-                              prize.quantity
-                            )}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="outline" className="text-xs">{(prize.probability * 100).toFixed(2)}%</Badge>
-                        </TableCell>
-                        <TableCell className="text-right text-xs text-muted-foreground">
-                          <span className="hidden sm:inline">每1000次約{Math.round(prize.probability * 1000)}次</span>
-                          <span className="sm:hidden">{Math.round(prize.probability * 1000)}/1k</span>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
+                    <TableBody>
+                      {card.prizes.map((prize, index) => {
+                        const stock = getStockForPrize(card.id, prize.id)
+                        return (
+                          <TableRow key={prize.id}>
+                            <TableCell className="font-medium text-xs sm:text-sm">{index + 1}</TableCell>
+                            <TableCell className="font-medium text-xs sm:text-sm">
+                              <div className="truncate max-w-[120px] sm:max-w-none" title={prize.text}>
+                                {prize.text}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Badge variant="secondary" className="text-xs">
+                                {prize.quantity === null ? (
+                                  <span className="flex items-center gap-1">
+                                    <Infinity className="h-3 w-3" />
+                                    無限
+                                  </span>
+                                ) : (
+                                  prize.quantity
+                                )}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {stock ? (
+                                <Badge
+                                  variant={stock.remaining_quantity === 0 ? "destructive" : "default"}
+                                  className="text-xs"
+                                >
+                                  {stock.remaining_quantity === null ? (
+                                    <span className="flex items-center gap-1">
+                                      <Infinity className="h-3 w-3" />
+                                      無限
+                                    </span>
+                                  ) : (
+                                    stock.remaining_quantity
+                                  )}
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="text-xs">載入中...</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Badge variant="outline" className="text-xs">{(prize.probability * 100).toFixed(2)}%</Badge>
+                            </TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">
+                              <span className="hidden sm:inline">每1000次約{Math.round(prize.probability * 1000)}次</span>
+                              <span className="sm:hidden">{Math.round(prize.probability * 1000)}/1k</span>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
                   </Table>
                 </div>
 
