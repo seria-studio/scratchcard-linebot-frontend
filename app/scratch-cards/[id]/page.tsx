@@ -10,12 +10,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Gift, Frown } from 'lucide-react';
 import { apiRequest } from '@/lib/api';
 import { selectPrizeForUser } from '@/lib/prize-selection';
+import { useToast } from '@/components/ui/use-toast';
 import type { ScratchCard as ScratchCardType, Prize, APIResponse } from '@/lib/types';
 
 function ScratchCardPageContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const scratchCardId = params.id as string;
+  const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -136,8 +138,13 @@ function ScratchCardPageContent() {
         })
       });
       setResultSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit scratch result:', error);
+      toast({
+        variant: "default",
+        title: "刮獎結果提交失敗",
+        description: error?.message || "無法提交刮獎結果，請稍後再試"
+      });
     }
   };
 
