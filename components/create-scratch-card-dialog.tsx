@@ -29,6 +29,8 @@ interface CreateScratchCardDialogProps {
 
 export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: CreateScratchCardDialogProps) {
   const [name, setName] = useState("")
+  const [startTime, setStartTime] = useState("")
+  const [endTime, setEndTime] = useState("")
   const [prizes, setPrizes] = useState<Prize[]>([])
   const [newPrize, setNewPrize] = useState<Prize>({
     text: "",
@@ -62,17 +64,29 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
 
     setLoading(true)
     try {
+      const requestBody: any = {
+        name,
+        prizes,
+      }
+      
+      if (startTime) {
+        requestBody.start_time = new Date(startTime).toISOString()
+      }
+      
+      if (endTime) {
+        requestBody.end_time = new Date(endTime).toISOString()
+      }
+      
       await apiRequest("/scratch_cards", {
         method: "POST",
-        body: JSON.stringify({
-          name,
-          prizes,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       onSuccess()
       onOpenChange(false)
       setName("")
+      setStartTime("")
+      setEndTime("")
       setPrizes([])
       toast({
         title: "建立成功",
@@ -103,6 +117,29 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
           <div className="space-y-2">
             <Label htmlFor="name">刮刮卡名稱</Label>
             <Input id="name" placeholder="請輸入刮刮卡名稱..." value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+
+          {/* Timing Settings */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start-time">開始時間 (選填)</Label>
+              <Input
+                id="start-time"
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end-time">結束時間 (選填)</Label>
+              <Input
+                id="end-time"
+                type="datetime-local"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                min={startTime || undefined}
+              />
+            </div>
           </div>
 
           {/* Add Prize */}
@@ -200,14 +237,13 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto mobile-table-scroll">
-                  <Table className="min-w-[600px]">
+                  <Table className="min-w-[500px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[50px]">序號</TableHead>
                         <TableHead>獎品名稱</TableHead>
                         <TableHead className="text-right">數量</TableHead>
                         <TableHead className="text-right">機率</TableHead>
-                        <TableHead className="text-right">預期中獎</TableHead>
                         <TableHead className="w-[80px]">操作</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -230,9 +266,6 @@ export function CreateScratchCardDialog({ open, onOpenChange, onSuccess }: Creat
                           </TableCell>
                           <TableCell className="text-right">
                             <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
-                          </TableCell>
-                          <TableCell className="text-right text-sm text-muted-foreground">
-                            每1000次約{Math.round(prize.probability * 1000)}次
                           </TableCell>
                           <TableCell>
                             <Button

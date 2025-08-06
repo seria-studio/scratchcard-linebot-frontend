@@ -30,6 +30,8 @@ interface EditScratchCardDialogProps {
 
 export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdit }: EditScratchCardDialogProps) {
   const [name, setName] = useState("")
+  const [startTime, setStartTime] = useState("")
+  const [endTime, setEndTime] = useState("")
   const [prizes, setPrizes] = useState<Prize[]>([])
   const [newPrize, setNewPrize] = useState<Prize>({
     text: "",
@@ -45,9 +47,28 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
     if (cardToEdit) {
       setName(cardToEdit.name)
       setPrizes(cardToEdit.prizes)
+      
+      // Convert ISO strings to datetime-local format in user's timezone
+      if (cardToEdit.start_time) {
+        const startDate = new Date(cardToEdit.start_time)
+        const localStartTime = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000)
+        setStartTime(localStartTime.toISOString().slice(0, 16))
+      } else {
+        setStartTime("")
+      }
+      
+      if (cardToEdit.end_time) {
+        const endDate = new Date(cardToEdit.end_time)
+        const localEndTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000)
+        setEndTime(localEndTime.toISOString().slice(0, 16))
+      } else {
+        setEndTime("")
+      }
     } else {
       // Reset form when dialog is closed or no card is being edited
       setName("")
+      setStartTime("")
+      setEndTime("")
       setPrizes([])
     }
   }, [cardToEdit])
@@ -74,12 +95,26 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
 
     setLoading(true)
     try {
+      const requestBody: any = {
+        name,
+        prizes,
+      }
+      
+      if (startTime) {
+        requestBody.start_time = new Date(startTime).toISOString()
+      } else {
+        requestBody.start_time = null
+      }
+      
+      if (endTime) {
+        requestBody.end_time = new Date(endTime).toISOString()
+      } else {
+        requestBody.end_time = null
+      }
+      
       await apiRequest(`/scratch_cards/${cardToEdit.id}`, {
         method: "PUT",
-        body: JSON.stringify({
-          name,
-          prizes,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       onSuccess()
@@ -113,6 +148,29 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
           <div className="space-y-2">
             <Label htmlFor="name">刮刮卡名稱</Label>
             <Input id="name" placeholder="請輸入刮刮卡名稱..." value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+
+          {/* Timing Settings */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start-time">開始時間 (選填)</Label>
+              <Input
+                id="start-time"
+                type="datetime-local"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end-time">結束時間 (選填)</Label>
+              <Input
+                id="end-time"
+                type="datetime-local"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                min={startTime || undefined}
+              />
+            </div>
           </div>
 
           {/* Add Prize */}
@@ -210,14 +268,13 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto mobile-table-scroll">
-                  <Table className="min-w-[600px]">
+                  <Table className="min-w-[500px]">
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[50px]">序號</TableHead>
                         <TableHead>獎品名稱</TableHead>
                         <TableHead className="text-right">數量</TableHead>
                         <TableHead className="text-right">機率</TableHead>
-                        <TableHead className="text-right">預期中獎</TableHead>
                         <TableHead className="w-[80px]">操作</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -240,9 +297,6 @@ export function EditScratchCardDialog({ open, onOpenChange, onSuccess, cardToEdi
                           </TableCell>
                           <TableCell className="text-right">
                             <Badge variant="outline">{(prize.probability * 100).toFixed(2)}%</Badge>
-                          </TableCell>
-                          <TableCell className="text-right text-sm text-muted-foreground">
-                            每1000次約{Math.round(prize.probability * 1000)}次
                           </TableCell>
                           <TableCell>
                             <Button
