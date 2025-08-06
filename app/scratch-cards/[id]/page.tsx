@@ -90,6 +90,27 @@ function ScratchCardPageContent() {
         console.log('Results:', cardData.results);
         console.log('User ID:', lineUserId);
 
+        // Check timing constraints
+        const currentTime = new Date();
+        
+        if (cardData.start_time) {
+          const startTime = new Date(cardData.start_time);
+          if (currentTime < startTime) {
+            setError(`這張刮刮卡尚未開始，開始時間：${startTime.toLocaleString('zh-TW')}`);
+            setLoading(false);
+            return;
+          }
+        }
+        
+        if (cardData.end_time) {
+          const endTime = new Date(cardData.end_time);
+          if (currentTime > endTime) {
+            setError(`這張刮刮卡已結束，結束時間：${endTime.toLocaleString('zh-TW')}`);
+            setLoading(false);
+            return;
+          }
+        }
+
         const userAlreadyScratched = cardData.results.some(result => result.user.id === lineUserId);
         if (userAlreadyScratched) {
           setError('您已經刮過這張刮刮卡了！');
