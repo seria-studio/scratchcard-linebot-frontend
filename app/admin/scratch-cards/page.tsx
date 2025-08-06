@@ -175,6 +175,18 @@ export default function ScratchCardsPage() {
                 <CardDescription className="mt-2 text-sm break-words">
                   <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                     <span>建立時間：{new Date(card.created_at).toLocaleDateString("zh-TW")}</span>
+                    {card.start_time && (
+                      <>
+                        <span className="hidden sm:inline">|</span>
+                        <span>開始時間：{new Date(card.start_time).toLocaleString("zh-TW")}</span>
+                      </>
+                    )}
+                    {card.end_time && (
+                      <>
+                        <span className="hidden sm:inline">|</span>
+                        <span>結束時間：{new Date(card.end_time).toLocaleString("zh-TW")}</span>
+                      </>
+                    )}
                     <span className="hidden sm:inline">|</span>
                     <span>獎品數量：{card.prizes.length}</span>
                     <span className="hidden sm:inline">|</span>
@@ -203,7 +215,6 @@ export default function ScratchCardsPage() {
                         <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">獎品數量</TableHead>
                         <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">剩餘庫存</TableHead>
                         <TableHead className="text-right min-w-[80px] text-xs sm:text-sm">中獎機率</TableHead>
-                        <TableHead className="text-right min-w-[100px] text-xs sm:text-sm">預期中獎數</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -250,10 +261,6 @@ export default function ScratchCardsPage() {
                             </TableCell>
                             <TableCell className="text-right">
                               <Badge variant="outline" className="text-xs">{(prize.probability * 100).toFixed(2)}%</Badge>
-                            </TableCell>
-                            <TableCell className="text-right text-xs text-muted-foreground">
-                              <span className="hidden sm:inline">每1000次約{Math.round(prize.probability * 1000)}次</span>
-                              <span className="sm:hidden">{Math.round(prize.probability * 1000)}/1k</span>
                             </TableCell>
                           </TableRow>
                         )
