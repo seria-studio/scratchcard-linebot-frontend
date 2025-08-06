@@ -60,6 +60,8 @@ export interface Prize extends BaseModel {
 export interface ScratchCard extends BaseModel {
   id: string;
   name: string;
+  start_time?: string | null;
+  end_time?: string | null;
   prizes: Prize[];
   results: ScratchResult[];
 }
