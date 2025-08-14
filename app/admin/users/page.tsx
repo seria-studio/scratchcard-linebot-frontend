@@ -123,6 +123,41 @@ export default function UsersPage() {
     }
   }
 
+  const handlePromoteToAdmin = async (userId: string) => {
+    if (!confirm("確定要將此用戶設為管理員嗎？")) {
+      return
+    }
+
+    try {
+      await apiRequest(`/users/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          is_admin: true
+        })
+      })
+      toast({
+        title: "成功",
+        description: "已設置為管理員"
+      })
+      fetchUsers(
+        userIdSearch.trim() || undefined,
+        displayNameSearch.trim() || undefined,
+        currentPage,
+        pageSize
+      )
+    } catch (error) {
+      console.error("Failed to promote to admin:", error)
+      toast({
+        title: "錯誤",
+        description: "設置管理員權限失敗，請稍後再試",
+        variant: "destructive"
+      })
+    }
+  }
+
   const handleRemoveAdmin = async (userId: string) => {
     if (!confirm("確定要移除管理員權限嗎？")) {
       return
@@ -426,7 +461,15 @@ export default function UsersPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {user.is_admin && (
+                            {!user.is_admin ? (
+                              <DropdownMenuItem
+                                onClick={() => handlePromoteToAdmin(user.id)}
+                                className="text-green-600"
+                              >
+                                <Shield className="mr-2 h-4 w-4" />
+                                設為管理員
+                              </DropdownMenuItem>
+                            ) : (
                               <DropdownMenuItem
                                 onClick={() => handleRemoveAdmin(user.id)}
                                 className="text-orange-600"
